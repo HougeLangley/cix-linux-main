@@ -667,6 +667,15 @@ diff --git a/drivers/firmware/arm_scmi/transports/virtio.c b/drivers/firmware/ar
 index 111111111111..222222222222 100644
 --- a/drivers/firmware/arm_scmi/transports/virtio.c
 +++ b/drivers/firmware/arm_scmi/transports/virtio.c
+@@ -373,7 +373,7 @@ static unsigned int virtio_get_max_msg(struct scmi_chan_info *base_cinfo)
+ 	return vioch->max_msg;
+ }
+ 
+-static bool virtio_chan_available(struct device_node *of_node, int idx)
++static bool virtio_chan_available(struct fwnode_handle *fwnode, int idx)
+ {
+ 	struct scmi_vio_channel *channels, *vioch = NULL;
+ 
 @@ -806,7 +806,7 @@ static const struct of_device_id scmi_of_match[] = {
  };
  
