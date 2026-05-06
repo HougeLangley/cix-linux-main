@@ -48,7 +48,7 @@ new file mode 100644
 index 000000000000..111111111111
 --- /dev/null
 +++ b/drivers/usb/typec/rts5453.c
-@@ -0,0 +1,799 @@
+@@ -0,0 +1,800 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * PD driver for typec connection
@@ -61,6 +61,7 @@ index 000000000000..111111111111
 +#include <linux/of.h>
 +#include <linux/regmap.h>
 +#include <linux/interrupt.h>
++#include <linux/irq.h>
 +#include <linux/device.h>
 +#include <linux/platform_device.h>
 +#include <linux/err.h>

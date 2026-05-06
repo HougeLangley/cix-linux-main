@@ -59,7 +59,7 @@ index 000000000000..111111111111
 +#include <linux/of.h>
 +#include <linux/platform_device.h>
 +#include <linux/pwm.h>
-+#include <linux/sysfb.h>
++#include <linux/screen_info.h>
 +#include <linux/slab.h>
 +#include <linux/acpi.h>
 +#include <linux/reset.h>
@@ -263,7 +263,7 @@ index 000000000000..111111111111
 +	pwmcr = readl(sky1->mmio_base + TCTL);
 +
 +	/* Check if PWM was already initialized by UEFI */
-+	if (sysfb_primary_display.screen.lfb_linelength && (pwmcr & (PWM_MODE | ENABLE | ENPWM)))
++	if (screen_info.lfb_linelength && (pwmcr & (PWM_MODE | ENABLE | ENPWM)))
 +		return devm_pwmchip_add(dev, chip);
 +
 +	/* Configure timer to PWM mode */

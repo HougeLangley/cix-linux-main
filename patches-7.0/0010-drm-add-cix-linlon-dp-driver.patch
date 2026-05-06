@@ -87,17 +87,14 @@ diff --git a/drivers/gpu/drm/Kconfig b/drivers/gpu/drm/Kconfig
 index 111111111111..222222222222 100644
 --- a/drivers/gpu/drm/Kconfig
 +++ b/drivers/gpu/drm/Kconfig
-@@ -273,9 +273,7 @@ config DRM_LIB_RANDOM
- 	bool
- 	default n
- 
--config DRM_PRIVACY_SCREEN
--	bool
--	default n
+@@ -273,6 +273,7 @@ config DRM_LIB_RANDOM
+ source "drivers/gpu/drm/aspeed/Kconfig"
+ source "drivers/gpu/drm/ast/Kconfig"
+ source "drivers/gpu/drm/atmel-hlcdc/Kconfig"
 +source "drivers/gpu/drm/cix/Kconfig"
- 
- # DRM driver Kconfig files, sorted
- source "drivers/gpu/drm/adp/Kconfig"
+ source "drivers/gpu/drm/bridge/Kconfig"
+ source "drivers/gpu/drm/etnaviv/Kconfig"
+ source "drivers/gpu/drm/exynos/Kconfig"
 diff --git a/drivers/gpu/drm/Makefile b/drivers/gpu/drm/Makefile
 index 111111111111..222222222222 100644
 --- a/drivers/gpu/drm/Makefile
