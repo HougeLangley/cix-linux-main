@@ -60,6 +60,16 @@ Requires:       %{name} = %{version}-%{release}
 Kernel headers, Makefiles, and .config required to build external
 kernel modules (DKMS, VirtualBox, NVIDIA, etc.) against %{name}.
 
+%package headers
+Summary:        Sanitized userspace headers for the Cix kernel
+Requires:       %{name} = %{version}-%{release}
+Conflicts:      kernel-headers
+
+%description headers
+This package provides the C header files that specify the interface
+between the Cix-custom Linux kernel and userspace libraries and programs.
+Installed under /usr/include/. Conflicts with the stock kernel-headers.
+
 # ============================================================================
 # %%prep - Extract kernel source, apply Cix patches, configure
 # ============================================================================
@@ -144,6 +154,9 @@ make INSTALL_MOD_PATH=%{buildroot} INSTALL_MOD_STRIP=1 \
 # ---- Kernel image → /boot/vmlinuz-<kverstr> ----
 # ARM64 uses uncompressed Image (or Image.gz); Fedora ARM uses Image
 install -Dm644 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{kverstr}
+
+# ---- Userspace API headers → /usr/include/ ----
+make headers_install ARCH=arm64 INSTALL_HDR_PATH=%{buildroot}/usr
 
 # ---- System.map ----
 install -Dm644 System.map %{buildroot}/boot/System.map-%{kverstr}
@@ -241,6 +254,10 @@ ln -sf /usr/src/kernels/%{kverstr} %{buildroot}/lib/modules/%{kverstr}/source
 /usr/src/kernels/%{kverstr}
 /lib/modules/%{kverstr}/build
 /lib/modules/%{kverstr}/source
+
+%files headers
+%defattr(-,root,root)
+/usr/include/
 
 # ============================================================================
 # %%post / %%postun - Scriptlets
