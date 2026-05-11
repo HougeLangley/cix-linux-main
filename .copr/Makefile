@@ -7,11 +7,13 @@
 #
 # This Makefile:
 #   1. Downloads Linux 7.0.4 kernel source tarball
-#   2. Builds the SRPM from the spec file + patches + config
+#   2. Creates a combined sources tarball (patches + config)
+#   3. Builds the SRPM (rpmbuild includes only files listed as Source/Patch)
 # ============================================================================
 
-KERNEL_URL  := https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.4.tar.xz
-KERNEL_TAR  := linux-7.0.4.tar.xz
+KERNEL_URL      := https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.4.tar.xz
+KERNEL_TAR      := linux-7.0.4.tar.xz
+CIX_SOURCES_TAR := cix-sources.tar.gz
 
 .PHONY: srpm
 
@@ -30,29 +32,25 @@ srpm:
 		}; \
 	fi
 
-	# ---- Step 2: Verify spec file and sources exist ----
+	# ---- Step 2: Create combined sources tarball for rpmbuild ----
+	# rpmbuild only packages files listed as Source/Patch in the spec.
+	# We bundle patches + config into a tarball that Source1 references.
+	@echo "[PACK] Creating $(CIX_SOURCES_TAR)"
+	@tar czf "$(CIX_SOURCES_TAR)" patches-7.0/ config/ || { \
+		echo "ERROR: Failed to create $(CIX_SOURCES_TAR)"; \
+		exit 1; \
+	}
+	@echo "  Patches: $$(ls patches-7.0/*.patch 2>/dev/null | wc -l)"
+	@echo "  Config:  $$(ls config/*.defconfig 2>/dev/null | wc -l) file(s)"
+
+	# ---- Step 3: Verify spec file exists ----
 	@if [ ! -f "$(spec)" ]; then \
 		echo "ERROR: Spec file not found: $(spec)"; \
-		echo "Contents of current directory:"; \
-		ls -la; \
 		exit 1; \
 	fi
-	@if [ ! -d "patches-7.0" ]; then \
-		echo "ERROR: patches-7.0/ directory not found"; \
-		exit 1; \
-	fi
-	@if [ ! -d "config" ]; then \
-		echo "ERROR: config/ directory not found"; \
-		exit 1; \
-	fi
-	@echo "[OK] Spec file and sources verified"
-
-	# ---- Step 3: Count patches for build log ----
-	@echo "Patches available: $$(ls patches-7.0/*.patch 2>/dev/null | wc -l)"
+	@echo "[OK] All sources ready"
 
 	# ---- Step 4: Build SRPM ----
-	# _sourcedir = current directory (where tarball, patches, config live)
-	# _srcrpmdir = output directory (where Copr expects the SRPM)
 	@echo "=== Generating SRPM ==="
 	rpmbuild -bs "$(spec)" \
 		--define "_sourcedir $(CURDIR)" \

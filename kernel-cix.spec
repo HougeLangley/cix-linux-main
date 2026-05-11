@@ -22,11 +22,12 @@ Summary:        Linux Kernel 7.0.4 with Cix P1 (Orion O6) patches
 License:        GPLv2
 URL:            https://github.com/HougeLangley/cix-linux-main
 
-# Kernel source tarball
-# For Copr (make srpm method): downloaded by .copr/Makefile before rpmbuild
-# For local builds: run `spectool -g kernel-cix.spec` first
+# Kernel source tarball (downloaded by .copr/Makefile, or via spectool -g locally)
 %define ksource linux-7.0.4
 Source0:        https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.4.tar.xz
+
+# Combined Cix patches + config (created by .copr/Makefile)
+Source1:        cix-sources.tar.gz
 
 # Only build for 64-bit ARM
 ExclusiveArch:  aarch64
@@ -61,6 +62,10 @@ kernel modules (DKMS, VirtualBox, NVIDIA, etc.) against %{name}.
 %prep
 %setup -q -n %{ksource}
 
+# ---- Extract Cix patches and config from Source1 tarball ----
+%setup -q -T -D -n %{ksource} -b 1
+# Now patches-7.0/ and config/ are extracted alongside the kernel source
+
 # ---- Apply Cix patches via git am (preserves authorship, handles ordering) ----
 git init -q
 git config user.email "builder@cix-copr"
@@ -69,7 +74,7 @@ git add -A
 git commit -q -m "%{ksource} base"
 
 echo "=== Applying Cix patches ==="
-for patch in %{_sourcedir}/patches-7.0/*.patch; do
+for patch in ../patches-7.0/*.patch; do
     patch_name=$(basename "$patch")
     echo "  [%{name}] $patch_name"
     git am "$patch" || {
@@ -80,11 +85,11 @@ for patch in %{_sourcedir}/patches-7.0/*.patch; do
     }
 done
 
-patch_count=$(ls %{_sourcedir}/patches-7.0/*.patch 2>/dev/null | wc -l)
+patch_count=$(ls ../patches-7.0/*.patch 2>/dev/null | wc -l)
 echo "=== Applied $patch_count Cix patches ==="
 
 # ---- Apply Cix defconfig ----
-cp %{_sourcedir}/config/config-7.0.defconfig .config
+cp ../config/config-7.0.defconfig .config
 make ARCH=arm64 olddefconfig
 
 # ---- Tune config for RPM packaging ----
