@@ -7,6 +7,11 @@
 # Copr then builds the SRPM into binary RPMs on aarch64 builders.
 # ============================================================================
 
+# ---- RPM Macros ----
+# Disable automatic debuginfo/debugsource generation
+# Kernel debug is done via kdump/crash, not RPM debuginfo packages
+%global debug_package %{nil}
+
 # ---- Versioning ----
 # Kernel release string format: 7.0.4-1.fc44.aarch64
 # EXTRAVERSION passed to make sets the local version suffix
@@ -259,7 +264,7 @@ fi
 # ============================================================================
 
 %changelog
-* Sun May 11 2026 Cix Kernel Builder <builder@cix-copr> - 7.0.4-1
+* Mon May 11 2026 Cix Kernel Builder <builder@cix-copr> - 7.0.4-1
 - Initial Copr build for Fedora 44 ARM64 (aarch64)
 - Apply 32 Cix P1 SoC patches (0001-0028 + 2001-2004)
 - Patches cover: ACPI, mailbox, SCMI, clk, reset, GPIO, I2C,
