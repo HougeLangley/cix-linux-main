@@ -97,9 +97,15 @@ echo "=== Applied $patch_count Cix patches ==="
 cp ../config/config-7.0.defconfig .config
 make ARCH=arm64 olddefconfig
 
+# ---- Prevent setlocalversion from appending git hash ----
+# After git am, the kernel build system detects the git repo and appends
+# -g<commit> to the version string. We must suppress this or the installed
+# path (/lib/modules/7.0.4-1.fc44.aarch64-gXXXXXXX) won't match %{kverstr}.
+rm -rf .git .gitignore .gitattributes 2>/dev/null || true
+# Also create .scmversion as a belt-and-suspenders fallback
+touch .scmversion
+
 # ---- Tune config for RPM packaging ----
-# Disable CONFIG_LOCALVERSION_AUTO (would append git hash)
-scripts/config --undefine CONFIG_LOCALVERSION_AUTO
 # Set module compression to reduce package size
 scripts/config --enable CONFIG_MODULE_COMPRESS_ZSTD
 # Disable signing (handled by rpm build or skipped)
